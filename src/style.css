@@ -10,3 +10,15 @@ body {
     width: 100vw;
     height: 100vh;
 }
+
+a {
+    text-decoration: none;
+}
+
+a.capture-btn {
+    position: absolute;
+    color: #ffffff7d;
+    top: 10px;
+    z-index: 1;
+    right: 10px;
+}

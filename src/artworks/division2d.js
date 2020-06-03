@@ -1,31 +1,29 @@
-let canvas;
-let animation;
-let ctx;
-let lines = [];
+import Canvas from "../canvas";
 
-export default function ({root, segmentSize, spaceBetween, drawCurves = true}) {
-  canvas = document.createElement('canvas');
-  canvas.width = root.clientWidth * 2;
-  canvas.height = root.clientHeight * 2;
-  canvas.style.height = '100%';
-  canvas.style.width = '100%';
-  root.appendChild(canvas);
-  ctx = canvas.getContext('2d');
+
+export default function ({ root, segmentSize, spaceBetween, drawCurves = true }) {
+  const canvas = new Canvas({
+    root,
+    name: 'division2d',
+    background: 'black',
+    showCaptureBtn: false
+  });
+
+  const ctx = canvas.ctx;
+  const lines = [];
 
   for (let i = 0; i < canvas.height; i += spaceBetween) {
     const line = [];
     for (let j = 0; j < canvas.width; j += segmentSize) {
       const variance = getVariance(j);
       const random = Math.random() * variance / 3 * -1;
-      const point = { x: j, y: i + random, color: `hsl(${Math.random()*360}, 100%, 50%)` };
+      const point = { x: j, y: i + random, color: `hsl(${Math.random() * 360}, 100%, 50%)` };
       line.push(point);
     }
     lines.push(line);
   }
 
-  function draw () {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+  canvas.animate(() => {
     for (let i = 4; i < lines.length - 1; i++) {
       const line = lines[i];
       ctx.beginPath();
@@ -33,7 +31,7 @@ export default function ({root, segmentSize, spaceBetween, drawCurves = true}) {
       for (let j = 0; j < line.length - 2; j++) {
         const point = line[j];
         const variance = getVariance(point.x);
-        const rand = Math.random() * variance / 100;
+        const rand = Math.random() * variance / 200;
         point.y = point.y + chooseRand(-rand, rand);
         ctx.lineWidth = 5;
         ctx.strokeStyle = point.color
@@ -51,19 +49,13 @@ export default function ({root, segmentSize, spaceBetween, drawCurves = true}) {
       ctx.restore();
       ctx.stroke();
     }
-
-    animation = requestAnimationFrame(draw);
-  }
+  });
 
   function getVariance (x) {
     const distanceToCenter = Math.abs(x - canvas.width / 2);
     return Math.max(canvas.width / 2 - 600 - distanceToCenter, 0);
   }
-
-  draw();
 }
-
-
 
 function chooseRand (value1, value2) {
   if (Math.random() < 0.5) {
