@@ -34,5 +34,7 @@
     "webpack-glob-entry": "^2.1.1",
     "webpack-merge": "^4.2.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "three": "0.117.1"
+  }
 }
