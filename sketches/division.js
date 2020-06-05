@@ -9,7 +9,7 @@ const settings = {
   fps: 24
 };
 
-const division2d = ({ width, height }) => {
+const division = ({ width, height }) => {
 
   const spaceBetween = 50;
   const segmentSize = 20;
@@ -31,14 +31,6 @@ const division2d = ({ width, height }) => {
     return Math.max(width / 2 - 600 - distanceToCenter, 0);
   }
 
-  function chooseRand (value1, value2) {
-    if (Math.random() < 0.5) {
-      return value1;
-    } else {
-      return value2;
-    }
-  }
-
   return ({ context: ctx, width, height }) => {
     ctx.clearRect(0, 0, width, height);
     ctx.canvas.style.background = 'black';
@@ -50,8 +42,7 @@ const division2d = ({ width, height }) => {
       for (let j = 0; j < line.length - 2; j++) {
         const point = line[j];
         const variance = getVariance(point.x);
-        const rand = Math.random() * variance / 100;
-        point.y = point.y + chooseRand(-rand, rand);
+        point.y = point.y + (Math.random() - 0.5) * variance / 100;
         ctx.lineWidth = 5;
         ctx.strokeStyle = point.color
         const xc = (lines[i][j].x + lines[i][j + 1].x) / 2;
@@ -67,4 +58,4 @@ const division2d = ({ width, height }) => {
   };
 };
 
-canvasSketch(division2d, settings);
+canvasSketch(division, settings);
