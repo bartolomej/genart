@@ -6,7 +6,7 @@ Develop sketch with `canvas-sketch src/foobar.js --hot --open`
 Build sketch with `canvas-sketch src/foobar.js --build`
 
 
-![Division](./images/division2d.png)
+![Division](images/division.png)
 
 ![Vector Field](./images/field.png)
 

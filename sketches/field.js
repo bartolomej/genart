@@ -9,7 +9,9 @@ const settings = {
   fps: 24
 };
 
-const division2d = ({ width, height }) => {
+const division2d = ({ width, height, context }) => {
+  context.canvas.style.background = 'black';
+
 
   const nVectors = 1000;
   const f = 40;

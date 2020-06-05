@@ -9,7 +9,8 @@ const settings = {
   fps: 24
 };
 
-const division2d = ({ width, height }) => {
+const division2d = ({ width, height, context }) => {
+  context.canvas.style.background = 'black';
 
   const nCurves = 10;
   const nPoints = 50;
