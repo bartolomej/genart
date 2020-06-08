@@ -2,7 +2,7 @@ const canvasSketch = require('canvas-sketch');
 
 const settings = {
   duration: 3,
-  dimensions: [1024, 1024],
+  dimensions: [2048, 2048],
   scaleToView: true,
   playbackRate: 'throttle',
   animate: true,
@@ -14,15 +14,15 @@ const sketch = ({ width, height, context }) => {
 
   const nPoints = 50;
   const trailLength = 25;
-  const dP = 8;
-  const pointSize = 4;
+  const spacing = 20;
+  const pointSize = 8;
   const start = { x: width / 2, y: height / 2 }
   const dTime = 0.04;
   const randomness = 30;
   let time = 0;
 
-  const posX = i => start.x + Math.cos(i + time) * dP * i;
-  const posY = i => start.x + Math.sin(i + time) * dP * i;
+  const posX = i => start.x + Math.cos(i + time) * spacing * i;
+  const posY = i => start.x + Math.sin(i + time) * spacing * i;
 
   const points = [];
   for (let i = 0; i < nPoints; i++) {

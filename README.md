@@ -15,4 +15,4 @@ Build sketch with `canvas-sketch src/foobar.js --build`
 
 ![Random Webs](./images/rwebs_curved.png)
 
-![Spiral](./images/spiral.png)
+<img alt="Spiral" style="background: black" src="./images/spiral.png" />
