@@ -12,17 +12,20 @@ const settings = {
 const sketch = ({ width, height, context }) => {
   context.canvas.style.background = 'black';
 
-  const nPoints = 50;
-  const trailLength = 25;
-  const spacing = 20;
+  const nPoints = 100;
+  const trailLength = 15;
+  const spacingFactor = 10;
   const pointSize = 8;
   const start = { x: width / 2, y: height / 2 }
   const dTime = 0.04;
-  const randomness = 30;
+  const randomness = 0;
   let time = 0;
 
-  const posX = i => start.x + Math.cos(i + time) * spacing * i;
-  const posY = i => start.x + Math.sin(i + time) * spacing * i;
+  const color = () => `hsl(${Math.sin(time) * 50 + 100}, 100%, 50%)`;
+  const spacing = () => Math.cos(time) * spacingFactor;
+  const a = () => Math.pow(Math.sin(time), 2);
+  const posX = i => start.x + Math.cos(i + time + a()) * spacing() * i;
+  const posY = i => start.x + Math.sin(i + time + a()) * spacing() * i;
 
   const points = [];
   for (let i = 0; i < nPoints; i++) {
@@ -50,12 +53,12 @@ const sketch = ({ width, height, context }) => {
         trail.splice(0, 1);
       }
 
-      const rand = () => ((Math.random() - 0.5) * Math.sin(time / 0.6)) * randomness;
+      const rand = () => ((Math.random() - 0.5) * Math.sin(time)) * randomness;
 
       points[i].x = posX(i) + rand();
       points[i].y = posY(i) + rand();
     }
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = color();
     ctx.fill();
 
     time += dTime;
