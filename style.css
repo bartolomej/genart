@@ -10,6 +10,10 @@ a {
     text-decoration: none;
 }
 
+body {
+    background: black;
+}
+
 #container {
     display: flex;
     flex-direction: row;
@@ -35,13 +39,15 @@ a {
 
 #container a img {
     width: 100%;
+    background: black;
+    border-radius: 20px;
 }
 
 #container a span {
-    font-size: 1.8em;
+    font-size: 1.5em;
     text-align: center;
     font-weight: bold;
-    color: palevioletred;
+    color: white;
 }
 
 @media (max-width: 700px) {
@@ -52,6 +58,6 @@ a {
     #container a {
         width: 90%;
         height: unset;
-        margin: 20px 0;
+        margin: 30px 0;
     }
 }

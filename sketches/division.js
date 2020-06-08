@@ -2,7 +2,7 @@ const canvasSketch = require('canvas-sketch');
 
 const settings = {
   duration: 3,
-  dimensions: [ 2048, 2048 ],
+  dimensions: [2048, 2048],
   scaleToView: true,
   playbackRate: 'throttle',
   animate: true,
@@ -13,6 +13,7 @@ const division = ({ width, height }) => {
 
   const spaceBetween = 50;
   const segmentSize = 20;
+  const useColor = false;
 
   const lines = [];
   for (let i = 0; i < height; i += spaceBetween) {
@@ -44,7 +45,7 @@ const division = ({ width, height }) => {
         const variance = getVariance(point.x);
         point.y = point.y + (Math.random() - 0.5) * variance / 100;
         ctx.lineWidth = 5;
-        ctx.strokeStyle = point.color
+        ctx.strokeStyle = useColor ? point.color : 'white';
         const xc = (lines[i][j].x + lines[i][j + 1].x) / 2;
         const yc = (lines[i][j].y + lines[i][j + 1].y) / 2;
         ctx.quadraticCurveTo(lines[i][j].x, lines[i][j].y, xc, yc);

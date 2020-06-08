@@ -12,9 +12,9 @@ const settings = {
 const division2d = ({ width, height, context }) => {
   context.canvas.style.background = 'black';
 
-  const nCurves = 10;
-  const nPoints = 50;
-  const lineWidth = 1;
+  const nCurves = 20;
+  const nPoints = 10;
+  const lineWidth = 2;
   const randomMove = () => (Math.random() - 0.5) * 10;
 
   const curves = [];
@@ -35,12 +35,17 @@ const division2d = ({ width, height, context }) => {
 
     for (let curve of curves) {
       ctx.beginPath();
+      ctx.moveTo(curve[0].x, curve[0].y);
       for (let i = 0; i < curve.length - 1; i++) {
-        ctx.moveTo(curve[i].x, curve[i].y);
-        ctx.lineTo(curve[i + 1].x, curve[i + 1].y);
+        const cx = (curve[i].x + curve[i + 1].x) / 2;
+        const cy = (curve[i].y + curve[i + 1].y) / 2;
+        const x = curve[i].x;
+        const y = curve[i].y;
+        ctx.quadraticCurveTo(x, y, cx, cy);
         curve[i].x += randomMove();
         curve[i].y += randomMove();
       }
+      ctx.moveTo(curve[curve.length - 1].x, curve[curve.length - 1].y);
       ctx.lineWidth = lineWidth;
       ctx.strokeStyle = curve[0].color;
       ctx.stroke();
