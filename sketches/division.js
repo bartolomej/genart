@@ -13,7 +13,7 @@ const division = ({ width, height }) => {
 
   const spaceBetween = 50;
   const segmentSize = 20;
-  const useColor = false;
+  const useColor = true;
 
   const lines = [];
   for (let i = 0; i < height; i += spaceBetween) {

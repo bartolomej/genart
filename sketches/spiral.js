@@ -21,7 +21,7 @@ const sketch = ({ width, height, context }) => {
   const randomness = 0;
   let time = 0;
 
-  const color = () => `hsl(${Math.sin(time) * 50 + 100}, 100%, 50%)`;
+  const color = () => `hsl(${Math.cos(time * 2) * 50 + 30}, 100%, 50%)`;
   const spacing = () => Math.cos(time) * spacingFactor;
   const a = () => Math.pow(Math.sin(time), 2);
   const posX = i => start.x + Math.cos(i + time + a()) * spacing() * i;
@@ -31,7 +31,6 @@ const sketch = ({ width, height, context }) => {
   for (let i = 0; i < nPoints; i++) {
     points.push({ x: posX(0), y: posY(0), trail: [] });
   }
-
 
   return ({ context: ctx, width, height }) => {
     ctx.clearRect(0, 0, width, height);
