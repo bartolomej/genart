@@ -9,6 +9,7 @@
     "build:field": "canvas-sketch sketches/field.js --dir public/sketches --build --html=public/sketch.html",
     "build:flow": "canvas-sketch sketches/flow.js --dir public/sketches --build --html=public/sketch.html",
     "build:spiral": "canvas-sketch sketches/spiral.js --dir public/sketches --build --html=public/sketch.html",
+    "build:sines": "canvas-sketch sketches/sines.js --dir public/sketches --build --html=public/sketch.html",
     "compress:images": "zip -r images.zip images/",
     "build": "yarn run build:circle && yarn run build:division && yarn run build:field && yarn run build:flow && yarn run build:spiral"
   },
