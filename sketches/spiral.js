@@ -12,16 +12,16 @@ const settings = {
 const sketch = ({ width, height, context }) => {
   context.canvas.style.background = 'black';
 
-  const nPoints = 100;
+  const nPoints = 120;
   const trailLength = 15;
-  const spacingFactor = 10;
+  const spacingFactor = 8;
   const pointSize = 8;
   const start = { x: width / 2, y: height / 2 }
   const dTime = 0.04;
   const randomness = 0;
   let time = 0;
 
-  const color = () => `hsl(${Math.cos(time * 2) * 50 + 30}, 100%, 50%)`;
+  const color = () => `hsl(${Math.cos(time * 2) * 50}, 100%, 70%)`;
   const spacing = () => Math.cos(time) * spacingFactor;
   const a = () => Math.pow(Math.sin(time), 2);
   const posX = i => start.x + Math.cos(i + time + a()) * spacing() * i;

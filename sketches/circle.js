@@ -18,7 +18,7 @@ const division2d = ({ width, height, context }) => {
   const dTime = 0.015;
   const dxFactor = 0.4;
   const dyFactor = 0.4;
-  const circularAmplitude = () => 5;
+  const circularAmplitude = () => 3;
   const circularFrequency = () => 2;
   const radius = (i) => Math.pow(Math.cos(time), 2) * 0.01 * i + 0.02;
   const dx = (i) => Math.cos(time * circularFrequency() + i * dxFactor) * circularAmplitude();

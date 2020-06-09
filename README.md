@@ -8,11 +8,6 @@ Develop sketch with `canvas-sketch src/foobar.js --hot --open`
 <br>
 Build sketch with `canvas-sketch src/foobar.js --build`
 
-
-![Division](images/division.png)
-
-![Vector Field](./images/field.png)
-
-![Random Webs](./images/rwebs_curved.png)
-
 ![Spiral](./images/spiral_appear.png)
+
+![Spiral](./images/circle.png)
