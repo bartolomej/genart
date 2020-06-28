@@ -7,7 +7,3 @@ Create new sketch with `canvas-sketch sketch.js --new --open --hot`
 Develop sketch with `canvas-sketch src/foobar.js --hot --open`
 <br>
 Build sketch with `canvas-sketch src/foobar.js --build`
-
-![Spiral](./images/spiral_appear.png)
-
-![Spiral](./images/circle.png)

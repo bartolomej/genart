@@ -6,7 +6,7 @@ const settings = {
   scaleToView: true,
   playbackRate: 'throttle',
   animate: true,
-  fps: 24
+  fps: 50
 };
 
 const sketch = ({ width, height, context }) => {
@@ -17,11 +17,11 @@ const sketch = ({ width, height, context }) => {
   const spacingFactor = 8;
   const pointSize = 8;
   const start = { x: width / 2, y: height / 2 }
-  const dTime = 0.04;
+  const dTime = 0.025;
   const randomness = 0;
   let time = 0;
 
-  const color = () => `hsl(${Math.cos(time * 2) * 50}, 100%, 70%)`;
+  const color = () => `hsl(40, ${Math.sin(time * 2 + 15.7) * 100}%, ${Math.cos(time * 2) * 40 + 60}%)`;
   const spacing = () => Math.cos(time) * spacingFactor;
   const a = () => Math.pow(Math.sin(time), 2);
   const posX = i => start.x + Math.cos(i + time + a()) * spacing() * i;

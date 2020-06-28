@@ -4,14 +4,15 @@
   "description": "",
   "main": "sketch.js",
   "scripts": {
-    "build:circle": "canvas-sketch sketches/circle.js --dir public/sketches --build --html=public/sketch.html",
-    "build:division": "canvas-sketch sketches/division.js --dir public/sketches --build --html=public/sketch.html",
-    "build:field": "canvas-sketch sketches/field.js --dir public/sketches --build --html=public/sketch.html",
-    "build:flow": "canvas-sketch sketches/flow.js --dir public/sketches --build --html=public/sketch.html",
-    "build:spiral": "canvas-sketch sketches/spiral.js --dir public/sketches --build --html=public/sketch.html",
-    "build:sines": "canvas-sketch sketches/sines.js --dir public/sketches --build --html=public/sketch.html",
+    "build:circle": "canvas-sketch src/sketches/circle.js --dir public/sketches --build --html=public/sketch.html",
+    "build:division": "canvas-sketch src/sketches/division.js --dir public/sketches --build --html=public/sketch.html",
+    "build:field": "canvas-sketch src/sketches/field.js --dir public/sketches --build --html=public/sketch.html",
+    "build:flow": "canvas-sketch src/sketches/flow.js --dir public/sketches --build --html=public/sketch.html",
+    "build:spiral": "canvas-sketch src/sketches/spiral.js --dir public/sketches --build --html=public/sketch.html",
+    "build:sines": "canvas-sketch src/sketches/sines.js --dir public/sketches --build --html=public/sketch.html",
+    "build:approx": "canvas-sketch src/sketches/approx.js --dir public/sketches --build --html=public/sketch.html",
     "compress:images": "zip -r public/images.zip images/",
-    "build": "yarn run build:circle && yarn run build:division && yarn run build:field && yarn run build:flow && yarn run build:spiral"
+    "build": "yarn run build:circle && yarn run build:division && yarn run build:field && yarn run build:flow && yarn run build:spiral && yarn run build:approx"
   },
   "repository": {
     "type": "git",

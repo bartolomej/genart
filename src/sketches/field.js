@@ -1,51 +1,98 @@
 const canvasSketch = require('canvas-sketch');
+const { Vector, Matrix } = require('../math');
 
 const settings = {
   duration: 3,
-  dimensions: [1800, 1800],
+  dimensions: [2000, 2000],
   scaleToView: true,
   playbackRate: 'throttle',
   animate: true,
   fps: 24
 };
 
-const division2d = ({ width, height, context }) => {
+const sketch = async ({ width: w, height: h, context }) => {
   context.canvas.style.background = 'black';
+  const res = { xMin: -w / 2, xMax: w / 2, yMin: -h / 2, yMax: h / 2 };
+  const bounds = { x: [-2, 2], y: [-2, 2] };
+  const spanX = Math.abs(bounds.x[0] - bounds.x[1]);
+  const spanY = Math.abs(bounds.y[0] - bounds.y[1]);
 
-
-  const nVectors = 1000;
-  const f = 40;
-  const dt = 0.1;
+  const nVectors = 200;
+  const showParticles = true;
+  const showVectors = true;
+  const maxPathLength = 50;
+  const dt = 0.001;
   let time = 0;
 
-  const len = v => Math.sqrt(v.x ** 2 + v.y ** 2);
-  const vx = p => Math.sin(p.x + p.y + time) * f;
-  const vy = p => Math.cos(p.y + time) * f;
+  const velocity = v => new Vector(v.y, v.x).scalarI(0.1);
+  const m = new Matrix([spanX / w, 0], [0, spanY / h]);
 
-  let vectors = [];
+  m.scalarM(10)
+
   let sqrt = Math.sqrt(nVectors);
-  let dx = width / sqrt;
-  let dy = height / sqrt;
-  for (let y = 0; y < height; y += dy) {
-    for (let x = 0; x < height; x += dx) {
-      vectors.push({ x, y });
+  let dx = w / sqrt;
+  let dy = h / sqrt;
+
+  let particles = [];
+  for (let y = res.yMin; y < res.yMax; y += dy) {
+    for (let x = res.xMin; x < res.xMax; x += dx) {
+      particles.push({ v: new Vector(x, y), path: [] });
     }
   }
 
   return ({ context: ctx, width, height }) => {
     ctx.clearRect(0, 0, width, height);
+    ctx.translate(width / 2, height / 2);
     ctx.beginPath();
-    for (let p of vectors) {
-      const v = { x: vx(p), y : vy(p) };
-      ctx.moveTo(p.x, p.y);
-      ctx.lineTo(p.x + v.x, p.y + v.y);
-      ctx.strokeStyle = `hsl(${len(v) * 10}, 100%, 50%)`;
-      ctx.stroke();
+
+    if (showVectors) {
+      drawVectors(ctx);
     }
+    if (showParticles) {
+      drawParticles(ctx);
+    }
+
+    ctx.strokeStyle = `#FFFFFF`;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.lineWidth = 2;
+    ctx.stroke();
     ctx.fill();
 
     time += dt;
   };
+
+  function drawParticles (ctx) {
+    for (let i = 0; i < particles.length; i++) {
+      let { path, v } = particles[i];
+
+      path.push(v.clone());
+
+      v.addM(velocity(v));
+      if (path.length >= maxPathLength) {
+        path.splice(0, 1);
+      }
+
+      for (let i = 0; i < path.length - 1; i++) {
+        const v0 = path[i];
+        const v1 = path[i + 1];
+        ctx.moveTo(v0.x, v0.y);
+        ctx.lineTo(v1.x, v1.y);
+      }
+    }
+  }
+
+  function drawVectors (ctx) {
+    const scale = 2;
+    for (let y = res.yMin; y < res.yMax; y += dy) {
+      for (let x = res.xMin; x < res.yMax; x += dx) {
+        const p = new Vector(x, y);
+        const v = velocity(p).scalarI(scale);
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + v.x, p.y + v.y);
+      }
+    }
+  }
+
 };
 
-canvasSketch(division2d, settings);
+canvasSketch(sketch, settings);
