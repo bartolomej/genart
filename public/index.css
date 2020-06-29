@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Bellota:wght@400;700&display=swap');
 
+
+/* GLOBAL STYLES */
+
 * {
     margin: 0;
     padding: 0;
@@ -14,6 +17,9 @@ body {
     background: radial-gradient(circle at 0% 50%, rgba(96, 16, 48, 0) 9px, #66113378 10px, rgba(96, 16, 48, 0) 11px) 0px 10px, radial-gradient(at 100% 100%, rgba(96, 16, 48, 0) 9px, #66113359 10px, rgba(96, 16, 48, 0) 11px), #000;
     background-size: 20px 20px;
 }
+
+
+/* HEADER STYLES */
 
 #header {
     color: white;
@@ -43,6 +49,9 @@ body {
     font-size: 1.3em;
 }
 
+
+/* MAIN SECTION STYLES */
+
 #body {
     display: flex;
     flex-direction: row;
@@ -64,6 +73,7 @@ body {
     width: 300px;
     height: 350px;
     transition: 0.2s all ease-in;
+    margin: 50px 10px;
 }
 
 #container .art-link:hover, .art-link:active {
@@ -82,6 +92,7 @@ body {
     text-align: center;
     font-weight: bold;
     color: white;
+    margin-top: 10px;
 }
 
 #download {
