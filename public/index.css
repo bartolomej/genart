@@ -21,7 +21,7 @@ body {
     align-items: center;
     flex-direction: column;
     text-align: center;
-    margin: 50px 0;
+    margin: 50px 10px;
 }
 
 #header a {
