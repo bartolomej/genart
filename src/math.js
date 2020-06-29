@@ -36,6 +36,10 @@ class Matrix {
   }
 
   inverseTransformI (v) {
+    return this.inverseMatrix().transformI(v);
+  }
+
+  inverseMatrix () {
     return new Matrix(
       [this.v1.y, -this.v0.y],
       [-this.v1.x, this.v0.x]

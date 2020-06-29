@@ -13,30 +13,33 @@ const settings = {
 const sketch = async ({ width: w, height: h, context }) => {
   context.canvas.style.background = 'black';
   const res = { xMin: -w / 2, xMax: w / 2, yMin: -h / 2, yMax: h / 2 };
-  const bounds = { x: [-2, 2], y: [-2, 2] };
-  const spanX = Math.abs(bounds.x[0] - bounds.x[1]);
-  const spanY = Math.abs(bounds.y[0] - bounds.y[1]);
 
-  const nVectors = 200;
+  const nObjects = 500;
   const showParticles = true;
-  const showVectors = true;
+  const showVectors = false;
   const maxPathLength = 50;
-  const dt = 0.001;
+  const pathWidth = 3;
+  const dt = 0.1;
   let time = 0;
 
-  const velocity = v => new Vector(v.y, v.x).scalarI(0.1);
+  const velocity = v => new Vector(Math.sin(v.y * Math.sin(v.y)), Math.sin(v.x * Math.sin(v.x))).scalarI(0.1);
+
+  const spanX = 12;
+  const spanY = 12;
   const m = new Matrix([spanX / w, 0], [0, spanY / h]);
 
-  m.scalarM(10)
-
-  let sqrt = Math.sqrt(nVectors);
+  let sqrt = Math.sqrt(nObjects);
   let dx = w / sqrt;
   let dy = h / sqrt;
 
   let particles = [];
   for (let y = res.yMin; y < res.yMax; y += dy) {
     for (let x = res.xMin; x < res.xMax; x += dx) {
-      particles.push({ v: new Vector(x, y), path: [] });
+      particles.push({
+        path: [],
+        v: m.transformI(new Vector(x, y)),
+        c: `hsla(${Math.random() * 100 + 150}, 100%, 50%, 1)`
+      });
     }
   }
 
@@ -52,18 +55,12 @@ const sketch = async ({ width: w, height: h, context }) => {
       drawParticles(ctx);
     }
 
-    ctx.strokeStyle = `#FFFFFF`;
-    ctx.fillStyle = '#FFFFFF';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fill();
-
     time += dt;
   };
 
   function drawParticles (ctx) {
     for (let i = 0; i < particles.length; i++) {
-      let { path, v } = particles[i];
+      let { path, v, c } = particles[i];
 
       path.push(v.clone());
 
@@ -73,24 +70,32 @@ const sketch = async ({ width: w, height: h, context }) => {
       }
 
       for (let i = 0; i < path.length - 1; i++) {
-        const v0 = path[i];
-        const v1 = path[i + 1];
+        const v0 = m.inverseTransformI(path[i]);
+        const v1 = m.inverseTransformI(path[i + 1]);
+        ctx.beginPath();
         ctx.moveTo(v0.x, v0.y);
         ctx.lineTo(v1.x, v1.y);
+        ctx.lineWidth = Math.round(pathWidth * (i / path.length)) + 1;
+        ctx.strokeStyle = c;
+        ctx.stroke();
       }
     }
   }
 
   function drawVectors (ctx) {
-    const scale = 2;
+    const scale = 3;
     for (let y = res.yMin; y < res.yMax; y += dy) {
       for (let x = res.xMin; x < res.yMax; x += dx) {
-        const p = new Vector(x, y);
+        const p = m.transformI(new Vector(x, y));
         const v = velocity(p).scalarI(scale);
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(p.x + v.x, p.y + v.y);
+        const drawP = m.inverseTransformI(p);
+        const drawV = m.inverseTransformI(v);
+        ctx.moveTo(drawP.x, drawP.y);
+        ctx.lineTo(drawP.x + drawV.x, drawP.y + drawV.y);
       }
     }
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.stroke();
   }
 
 };
