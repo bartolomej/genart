@@ -3,7 +3,7 @@ const { Vector, Matrix } = require('../math');
 
 const settings = {
   duration: 3,
-  dimensions: [2000, 2000],
+  dimensions: [4000, 4000],
   scaleToView: true,
   playbackRate: 'throttle',
   animate: true,
@@ -11,28 +11,24 @@ const settings = {
 };
 
 const sketch = async ({ width: w, height: h, context }) => {
-  context.canvas.style.background = 'black';
   const res = { xMin: -w / 2, xMax: w / 2, yMin: -h / 2, yMax: h / 2 };
 
-  const nVectors = 2000;
-  const nParticles = 10;
-  const showParticles = true;
-  const showVectors = true;
+  const nVectors = 1000;
+  const nParticles = 1000;
   const maxPathLength = 50;
-  const pathWidth = 3;
+  const pathWidth = 20;
   const dt = 0.1;
   let time = 0;
-  const spanX = 12;
-  const spanY = 12;
+  const spanX = 20;
+  const spanY = 20;
 
   // transformation matrix
   const m = new Matrix([spanX / w, 0], [0, spanY / h]);
   // velocity gradient vector function
   const velocity = v => new Vector(
-    Math.sin(v.y * Math.sin(v.y)),
-    Math.sin(v.x * Math.sin(v.x))
-  ).scalarI(0.1);
-
+    Math.sin(v.y * Math.sin(v.x * Math.sin(v.y))),
+    Math.sin(v.x * Math.sin(v.y * Math.sin(v.x)))
+  ).scalarI(0.2);
 
   // calculate n of vectors for each dimension
   let vSrt = Math.sqrt(nVectors);
@@ -40,7 +36,7 @@ const sketch = async ({ width: w, height: h, context }) => {
 
   // calculate n of particles for each dimension
   let dSrt = Math.sqrt(nParticles);
-  let pdx = w / vSrt, pdy = h / dSrt;
+  let pdx = w / dSrt, pdy = h / dSrt;
 
   // generate initial particles
   let particles = [];
@@ -49,7 +45,7 @@ const sketch = async ({ width: w, height: h, context }) => {
       particles.push({
         path: [],
         v: m.transformI(new Vector(x, y)),
-        c: `hsla(${Math.random() * 100 + 150}, 100%, 50%, 1)`
+        c: `hsla(${Math.random() * 100 + 260}, 100%, 50%, 1)`
       });
     }
   }
@@ -59,10 +55,13 @@ const sketch = async ({ width: w, height: h, context }) => {
     ctx.translate(width / 2, height / 2);
     ctx.beginPath();
 
-    if (showVectors) {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(-width, -height, width * 2, height * 2);
+
+    if (nVectors > 0) {
       drawVectors(ctx);
     }
-    if (showParticles) {
+    if (nParticles > 0) {
       drawParticles(ctx);
     }
 
