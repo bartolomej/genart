@@ -31,6 +31,17 @@ class Matrix {
     this.v1.scalarM(n);
   }
 
+  rotateM (angle) {
+    this.v0.x = Math.cos(angle);
+    this.v0.y = Math.sin(angle);
+    this.v1.x = -Math.sin(angle);
+    this.v1.y = Math.cos(angle);
+  }
+
+  rotateI (angle) {
+
+  }
+
   transformI (v) {
     return this.v0.scalarI(v.x).addI(this.v1.scalarI(v.y));
   }
