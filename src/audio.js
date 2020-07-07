@@ -6,8 +6,8 @@ class Audio {
     this.data = null;
   }
 
-  // NOTE: must open with http://localhost
-  init () {
+  // NOTE: must open with http://192.168...
+  async init () {
     return new Promise((resolve, reject) => {
       let navigator = window.navigator;
 

@@ -4,7 +4,7 @@ These experiments utilize a helpful library called [canvas-sketch](https://githu
 
 ```bash
 # Start a new sketch from the Three.js template
-canvas-sketch --new --template=three --open
+canvas-sketch --new --template=three
 
 # Run existing sketch
 canvas-sketch sketch.js --open --hot

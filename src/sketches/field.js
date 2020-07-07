@@ -3,7 +3,7 @@ const { Vector, Matrix } = require('../math');
 
 const settings = {
   duration: 3,
-  dimensions: [4000, 4000],
+  dimensions: [2000, 2000],
   scaleToView: true,
   playbackRate: 'throttle',
   animate: true,
@@ -13,22 +13,21 @@ const settings = {
 const sketch = async ({ width: w, height: h, context }) => {
   const res = { xMin: -w / 2, xMax: w / 2, yMin: -h / 2, yMax: h / 2 };
 
-  const nVectors = 1000;
+  const nVectors = 10;
   const nParticles = 1000;
-  const maxPathLength = 50;
-  const pathWidth = 20;
-  const dt = 0.1;
-  let time = 0;
-  const spanX = 20;
-  const spanY = 20;
+  const maxPathLength = 100;
+  const pathWidth = 5;
+  const integrationStep = 0.01;
+  const spanX = 1;
+  const spanY = 1;
 
   // transformation matrix
   const m = new Matrix([spanX / w, 0], [0, spanY / h]);
   // velocity gradient vector function
-  const velocity = v => new Vector(
-    Math.sin(v.y * Math.sin(v.x * Math.sin(v.y))),
-    Math.sin(v.x * Math.sin(v.y * Math.sin(v.x)))
-  ).scalarI(0.2);
+  const velocity = p => new Vector(
+    -Math.pow(p.y, 2),
+    Math.pow(p.x, 3) + Math.pow(p.y, 2)
+  ).scalarI(integrationStep);
 
   // calculate n of vectors for each dimension
   let vSrt = Math.sqrt(nVectors);
@@ -45,7 +44,7 @@ const sketch = async ({ width: w, height: h, context }) => {
       particles.push({
         path: [],
         v: m.transformI(new Vector(x, y)),
-        c: `hsla(${Math.random() * 100 + 260}, 100%, 50%, 1)`
+        c: `hsla(${Math.random() * 100 + 150}, 100%, 50%, 1)`
       });
     }
   }
@@ -53,6 +52,7 @@ const sketch = async ({ width: w, height: h, context }) => {
   return ({ context: ctx, width, height }) => {
     ctx.clearRect(0, 0, width, height);
     ctx.translate(width / 2, height / 2);
+    ctx.scale(1, -1);
     ctx.beginPath();
 
     ctx.fillStyle = 'black';
@@ -64,8 +64,6 @@ const sketch = async ({ width: w, height: h, context }) => {
     if (nParticles > 0) {
       drawParticles(ctx);
     }
-
-    time += dt;
   };
 
   function drawParticles (ctx) {
@@ -93,7 +91,7 @@ const sketch = async ({ width: w, height: h, context }) => {
   }
 
   function drawVectors (ctx) {
-    const scale = 2;
+    const scale = 1;
     for (let y = res.yMin; y < res.yMax; y += vdy) {
       for (let x = res.xMin; x < res.yMax; x += vdx) {
         const p = m.transformI(new Vector(x, y));
