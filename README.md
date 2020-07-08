@@ -10,5 +10,5 @@ canvas-sketch --new --template=three
 canvas-sketch sketch.js --open --hot
 
 # Build a sketch
-canvas-sketch src/sketches/sketch.js --dir public/sketches --build --html=public/sketch.html
+canvas-sketch src/sketches/sketch.js --dir public/sketches --build --source-map=false --html=public/sketch.html
 ```

@@ -19,7 +19,7 @@ const sketch = ({ context }) => {
   // initial configuration
   let nPoints = 100;
   let pathLength = 10;
-  let showPath = false;
+  let showPath = true;
   let showPoints = true;
   let span = 5;
   let vx = '0';
@@ -100,9 +100,13 @@ const sketch = ({ context }) => {
     set showPath (b) {
       showPath = b;
       if (b) {
-        scene.add(pathsObj);
+        for (let p of pathsObj) {
+          scene.add(p);
+        }
       } else {
-        scene.remove(pathsObj);
+        for (let p of pathsObj) {
+          scene.remove(p);
+        }
       }
     }
     get showPath () {
@@ -233,14 +237,6 @@ const sketch = ({ context }) => {
     }
   }
 
-  function render ({ time }) {
-    updatePath();
-    updatePoints();
-
-    controls.update();
-    renderer.render(scene, camera);
-  }
-
   // draw each frame
   return {
     // Handle resize events here
@@ -256,7 +252,13 @@ const sketch = ({ context }) => {
       renderer.dispose();
     },
     // Update & render your scene here
-    render,
+    render ({ time }) {
+      updatePath();
+      updatePoints();
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
   };
 };
 
