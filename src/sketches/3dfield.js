@@ -166,6 +166,10 @@ const sketch = ({ context }) => {
   function updateField () {
     try {
       field = new Function(`
+        const cos = Math.cos;
+        const sin = Math.sin;
+        const pow = Math.pow;
+        const sqrt = Math.sqrt;
         return v => new THREE.Vector3(${vx}, ${vy}, ${vz});
       `)();
     } catch (e) {

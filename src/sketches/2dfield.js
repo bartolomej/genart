@@ -52,6 +52,7 @@ const sketch = ({ context }) => {
   // initialize geometries
   initPoints();
   initPaths();
+
   if (showPath) {
     for (let path of pathsObj) {
       scene.add(path);
@@ -140,6 +141,10 @@ const sketch = ({ context }) => {
   function updateField () {
     try {
       field = new Function(`
+        const cos = Math.cos;
+        const sin = Math.sin;
+        const pow = Math.pow;
+        const sqrt = Math.sqrt;
         return v => new THREE.Vector3(${vx}, ${vy});
       `)();
     } catch (e) {
@@ -169,7 +174,7 @@ const sketch = ({ context }) => {
         // setup path geometry
         const pathGeometry = new THREE.BufferGeometry();
         const pathArray = new Float32Array(pathLength * 2);
-        for (let i = 0; i < pathArray.length - 1; i += 2) {
+        for (let i = 0; i < pathArray.length; i += 2) {
           pathArray[i] = x;
           pathArray[i + 1] = y;
         }
@@ -206,7 +211,7 @@ const sketch = ({ context }) => {
   function updatePoints () {
     const position = pointGeometry.attributes.position.array;
     pointGeometry.attributes.position.needsUpdate = true;
-    for (let i = 0; i < position.length - 2; i += 2) {
+    for (let i = 0; i < position.length; i += 2) {
       const p = new THREE.Vector3(
         position[i],
         position[i + 1]

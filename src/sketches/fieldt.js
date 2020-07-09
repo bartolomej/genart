@@ -7,6 +7,7 @@ require("three/examples/js/controls/OrbitControls");
 require("three/examples/js/controls/FlyControls");
 
 const canvasSketch = require("canvas-sketch");
+const { toByteRGB } = require("../utils");
 
 const settings = {
   // Make the loop animated
@@ -184,15 +185,6 @@ const sketch = ({ context }) => {
       }
     }
     return lines;
-  }
-
-  function toByteRGB (color) {
-    return {
-      r: (color.getHex() & 0xff0000) >> 16,
-      g: (color.getHex() & 0x00ff00) >> 8,
-      b: (color.getHex() & 0x0000ff)
-    };
-
   }
 
 };
