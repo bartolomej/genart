@@ -8,6 +8,7 @@ require("three/examples/js/math/SimplexNoise");
 require("three/examples/js/math/ImprovedNoise");
 
 const canvasSketch = require("canvas-sketch");
+const { toByteRGB } = require("../utils");
 
 const settings = {
   // Make the loop animated
@@ -19,9 +20,13 @@ const settings = {
 const sketch = ({ context }) => {
 
   let sqrtParticles = 14;
-  let pathLength = 100;
+  let pathLength = 1000;
   let span = 10;
+  let startHue = 230;
+  let hueFactor = 50;
   let velocityK = 0.01;
+  let showPath = true;
+  let showParticles = true;
   // three objects
   let particlesObj;
   let pathsObj;
@@ -65,7 +70,9 @@ const sketch = ({ context }) => {
     geometry.setAttribute('position', new THREE.BufferAttribute(particles, 2));
     const pointMaterial = new THREE.PointsMaterial({ size: 0.1 });
     particlesObj = new THREE.Points(geometry, pointMaterial);
-    scene.add(particlesObj);
+    if (showParticles) {
+      scene.add(particlesObj);
+    }
   }
 
   function generatePaths () {
@@ -79,12 +86,27 @@ const sketch = ({ context }) => {
           path[i] = x;
           path[i + 1] = y;
         }
+        const colors = new Uint8Array(pathLength * 3);
+        const hue = Math.random() * hueFactor + startHue;
+        for (let i = 0; i < colors.length; i += 3) {
+          const luminosity = Math.round(50 * (1 / ((i / path.length) + 1)));
+          const color = toByteRGB(new THREE.Color(`hsl(${hue}, 100%, ${luminosity}%)`));
+          colors[i] = color.r;
+          colors[i + 1] = color.g;
+          colors[i + 2] = color.b;
+        }
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.BufferAttribute(path, 2));
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, });
-        const line = new THREE.Line(geometry, lineMaterial);
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3, true));
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: 0xffffff,
+          vertexColors: THREE.VertexColors
+        });
+        const line = new THREE.LineSegments(geometry, lineMaterial);
         pathsObj.push(line);
-        scene.add(line);
+        if (showPath) {
+          scene.add(line);
+        }
       }
     }
   }
@@ -162,6 +184,50 @@ const sketch = ({ context }) => {
       return velocityK;
     }
 
+    set showParticles (b) {
+      showParticles = b;
+      if (b) {
+        scene.add(particlesObj);
+      } else {
+        scene.remove(particlesObj);
+      }
+    }
+
+    get showParticles () {
+      return showParticles;
+    }
+
+    set showPath (b) {
+      showPath = b;
+      if (b) {
+        for (let p of pathsObj) scene.add(p);
+      } else {
+        for (let p of pathsObj) scene.remove(p);
+      }
+    }
+
+    get showPath () {
+      return showPath;
+    }
+
+    set startHue (b) {
+      startHue = b;
+      initAll();
+    }
+
+    get startHue () {
+      return startHue;
+    }
+
+    set hueFactor (b) {
+      hueFactor = b;
+      initAll();
+    }
+
+    get hueFactor () {
+      return hueFactor;
+    }
+
     set noise (s) {
       noiseType = s;
       if (s === 'PERLIN') {
@@ -183,6 +249,7 @@ const sketch = ({ context }) => {
     }
     generateParticles();
     generatePaths();
+
   }
 
   const c = new Controls();
@@ -191,6 +258,10 @@ const sketch = ({ context }) => {
   gui.add(c, 'sqrtParticles');
   gui.add(c, 'pathLength');
   gui.add(c, 'velocityK');
+  gui.add(c, 'showParticles');
+  gui.add(c, 'showPath');
+  gui.add(c, 'startHue');
+  gui.add(c, 'hueFactor');
   gui.add(c, 'noise', ['PERLIN', 'SIMPLEX']);
 
   // draw each frame
