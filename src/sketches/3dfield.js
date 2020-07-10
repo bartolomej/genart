@@ -24,15 +24,16 @@ const sketch = ({ context }) => {
   let pointSize = 0.1;
   let showPoints = true;
   let showPaths = true;
-  let pathLength = 10;
+  let pathLength = 800;
   let startHue = 230;
   let hueFactor = 50;
   let movementSpeed = 5;
-  let rollSpeed = 0.3;
+  let rollSpeed = 0.09;
   let span = 10;
   let vx = '0';
   let vy = '0';
   let vz = '0';
+  let example = null;
 
   let pointGeometry;
   let pointsObj;
@@ -50,7 +51,7 @@ const sketch = ({ context }) => {
 
   // Setup a camera
   const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 500);
-  camera.position.set(0, 0, 20);
+  camera.position.set(15, 15, 15);
   camera.lookAt(new THREE.Vector3());
 
   // Setup camera controller
@@ -205,6 +206,38 @@ const sketch = ({ context }) => {
     resetField () {
       initAll();
     }
+
+    set examples (s) {
+      example = s;
+      switch (s) {
+        case '1': {
+          vx = 'sin(v.x * sin(v.z))';
+          vy = 'sin(v.y * sin(v.x))';
+          vz = 'sin(v.z * sin(v.y))';
+          updateField();
+          break;
+        }
+        case '2': {
+          vx = 'cos(v.x * sin(v.z * sin(v.x)))';
+          vy = 'sin(v.y * sin(v.x * cos(v.z)))';
+          vz = 'sin(v.z * cos(v.y * sin(v.y)))';
+          updateField();
+          break;
+        }
+        default: {
+          vx = '0';
+          vy = '0';
+          vz = '0';
+          updateField();
+          initAll();
+          break;
+        }
+      }
+    }
+
+    get examples () {
+      return example;
+    }
   }
 
   function initAll () {
@@ -246,6 +279,7 @@ const sketch = ({ context }) => {
   gui.add(c, 'vy');
   gui.add(c, 'vz');
   gui.add(c, 'resetField');
+  gui.add(c, 'examples', [null, '1', '2', '3']);
 
   function initPaths () {
     pathsObj = [];
@@ -343,11 +377,17 @@ const sketch = ({ context }) => {
   function updatePaths () {
     for (let pathGeometry of pathGeometries) {
       const path = pathGeometry.attributes.position.array;
+      const colors = pathGeometry.attributes.color.array;
       const p = new THREE.Vector3(path[0], path[1], path[2]);
       for (let i = path.length - 6; i >= 0; i -= 3) {
+        // shift positions
         path[i + 3] = path[i];
         path[i + 4] = path[i + 1];
         path[i + 5] = path[i + 2];
+        // shift corresponding colors
+        colors[i + 3] = colors[i];
+        colors[i + 4] = colors[i + 1];
+        colors[i + 5] = colors[i + 2];
       }
       const v = field(p);
       v.multiplyScalar(speedF);
@@ -355,7 +395,13 @@ const sketch = ({ context }) => {
       path[0] = p.x;
       path[1] = p.y;
       path[2] = p.z;
+      const h = v.length() * 80 * 160 + 100;
+      const c = toByteRGB(new THREE.Color(`hsl(${h}, 100%, 50%)`))
+      colors[0] = c.r;
+      colors[1] = c.g;
+      colors[2] = c.b;
       pathGeometry.attributes.position.needsUpdate = true;
+      pathGeometry.attributes.color.needsUpdate = true;
     }
   }
 

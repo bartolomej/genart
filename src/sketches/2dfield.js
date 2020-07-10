@@ -18,15 +18,16 @@ const settings = {
 const sketch = ({ context }) => {
 
   // initial configuration
-  let nParticles = 100;
-  let pathLength = 10;
+  let nParticles = 50;
+  let pathLength = 100;
   let showPath = true;
   let showPoints = true;
   let startHue = 230;
   let hueFactor = 50;
-  let span = 5;
+  let span = 20;
   let vx = '0';
   let vy = '0';
+  let example = null;
 
   let pointsObj;
   let pathsObj = [];
@@ -159,6 +160,34 @@ const sketch = ({ context }) => {
       return showPoints;
     }
 
+    set example (e) {
+      example = e;
+      switch (e) {
+        case '1': {
+          vx = 'sin(v.x * sin(v.x * sin(v.y)))';
+          vy = 'sin(v.y * cos(v.x * sin(v.y)))';
+          updateField();
+          break;
+        }
+        case '2': {
+          vx = '-sin(v.y * sin(v.x * cos(v.x)))';
+          vy = 'sin(v.y * cos(v.x * cos(v.y)))';
+          updateField();
+          break;
+        }
+        default: {
+          vx = '0';
+          vy = '0';
+          updateField();
+          initAll();
+        }
+      }
+    }
+
+    get example () {
+      return example;
+    }
+
     resetField () {
       initAll();
     }
@@ -200,11 +229,12 @@ const sketch = ({ context }) => {
   gui.add(c, 'startHue');
   gui.add(c, 'hueFactor');
   gui.add(c, 'resetField');
+  gui.add(c, 'example', [null, '1', '2']);
 
   function initPaths () {
     pathsObj = [];
     pathGeometries = [];
-    const diff = span / Math.sqrt(nParticles);
+    const diff = span / nParticles;
     const start = -span / 2, end = span / 2;
     for (let y = start; y < end; y += diff) {
       for (let x = start; x < end; x += diff) {
@@ -240,9 +270,9 @@ const sketch = ({ context }) => {
   }
 
   function initParticles () {
-    const diff = span / Math.sqrt(nParticles);
+    const diff = span / nParticles;
     const start = -span / 2, end = span / 2;
-    const pointArray = new Float32Array(nParticles * 2);
+    const pointArray = new Float32Array(Math.pow(nParticles, 2) * 2);
     let index = 0;
     for (let y = start; y < end; y += diff) {
       for (let x = start; x < end; x += diff) {
