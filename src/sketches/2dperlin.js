@@ -4,6 +4,7 @@ const dat = require('dat.gui');
 
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
+require("three/examples/js/controls/FlyControls");
 require("three/examples/js/math/SimplexNoise");
 require("three/examples/js/math/ImprovedNoise");
 
@@ -19,14 +20,15 @@ const settings = {
 
 const sketch = ({ context }) => {
 
-  let sqrtParticles = 14;
-  let pathLength = 1000;
+  let sqrtParticles = 20;
+  let pathLength = 300;
   let span = 10;
-  let startHue = 230;
-  let hueFactor = 50;
-  let velocityK = 0.01;
+  let startHue = 200;
+  let hueFactor = 100;
+  let velocityK = 0.04;
   let showPath = true;
-  let showParticles = true;
+  let showParticles = false;
+  let isPause = false;
   // three objects
   let particlesObj;
   let pathsObj;
@@ -41,12 +43,17 @@ const sketch = ({ context }) => {
   renderer.setClearColor("#000", 1);
 
   // Setup a camera
-  const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 500);
-  camera.position.set(0, 0, 20);
+  const camera = new THREE.PerspectiveCamera(50, 1, 1, 1000);
+  camera.position.set(0, 0, 30);
   camera.lookAt(new THREE.Vector3());
 
   // Setup camera controller
-  const controls = new THREE.OrbitControls(camera, context.canvas);
+  // const controls = new THREE.OrbitControls(camera, context.canvas);
+  const controls = new THREE.FlyControls(camera, renderer.domElement);
+  controls.movementSpeed = 5;
+  controls.domElement = renderer.domElement;
+  controls.rollSpeed = 0.1;
+  controls.dragToLook = true;
 
   // Setup your scene
   const scene = new THREE.Scene();
@@ -86,6 +93,7 @@ const sketch = ({ context }) => {
           path[i] = x;
           path[i + 1] = y;
         }
+        // generate random colors for line within hue interval
         const colors = new Uint8Array(pathLength * 3);
         const hue = Math.random() * hueFactor + startHue;
         for (let i = 0; i < colors.length; i += 3) {
@@ -119,9 +127,20 @@ const sketch = ({ context }) => {
       const p = new THREE.Vector3(particlePos[i], particlePos[i + 1]);
       const v = new THREE.Vector3(1, 0);
       const m = new THREE.Matrix3();
-      const n = noiseType === 'PERLIN'
-        ? (noise.noise(p.x, p.y, clock.getElapsedTime()) - 0.5) * Math.PI * 2
-        : noise.noise(p.x, p.y) * Math.PI * 2;
+      let n;
+      switch (noiseType) {
+        case 'PERLIN':
+          n = Math.abs(noise.noise(p.x, p.y, clock.getElapsedTime())) * Math.PI * 8;
+          break;
+        case 'SIMPLEX':
+          n = noise.noise(p.x, p.y) * Math.PI * 2;
+          break;
+        case 'RANDOM':
+          n = Math.random() * Math.PI * 2;
+          break;
+        default:
+          throw new Error('Noise type not supported');
+      }
       m.set(
         Math.cos(n), -Math.sin(n), 0,
         Math.sin(n), Math.cos(n), 0,
@@ -241,6 +260,14 @@ const sketch = ({ context }) => {
     get noise () {
       return noiseType;
     }
+
+    resetField () {
+      initAll();
+    }
+
+    pause() {
+      isPause = !isPause;
+    }
   }
 
   function initAll () {
@@ -262,7 +289,9 @@ const sketch = ({ context }) => {
   gui.add(c, 'showPath');
   gui.add(c, 'startHue');
   gui.add(c, 'hueFactor');
-  gui.add(c, 'noise', ['PERLIN', 'SIMPLEX']);
+  gui.add(c, 'noise', ['PERLIN', 'SIMPLEX', 'RANDOM']);
+  gui.add(c, 'resetField');
+  gui.add(c, 'pause');
 
   // draw each frame
   return {
@@ -275,8 +304,10 @@ const sketch = ({ context }) => {
     },
     // Update & render your scene here
     render ({ time }) {
+      if (isPause) return;
+      const delta = clock.getDelta();
       update();
-      controls.update();
+      controls.update(delta);
       renderer.render(scene, camera);
     },
     // Dispose of events & renderer for cleaner hot-reloading

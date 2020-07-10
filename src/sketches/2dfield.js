@@ -6,6 +6,7 @@ const dat = require('dat.gui');
 require("three/examples/js/controls/OrbitControls");
 
 const canvasSketch = require("canvas-sketch");
+const { toByteRGB } = require("../utils");
 
 const settings = {
   // Make the loop animated
@@ -17,10 +18,12 @@ const settings = {
 const sketch = ({ context }) => {
 
   // initial configuration
-  let nPoints = 100;
+  let nParticles = 100;
   let pathLength = 10;
   let showPath = true;
   let showPoints = true;
+  let startHue = 230;
+  let hueFactor = 50;
   let span = 5;
   let vx = '0';
   let vy = '0';
@@ -50,7 +53,7 @@ const sketch = ({ context }) => {
   const scene = new THREE.Scene();
 
   // initialize geometries
-  initPoints();
+  initParticles();
   initPaths();
 
   if (showPath) {
@@ -67,37 +70,65 @@ const sketch = ({ context }) => {
       vx = s;
       updateField();
     }
+
     get vx () {
       return vx;
     }
+
     set vy (s) {
       vy = s;
       updateField();
     }
+
     get vy () {
       return vy;
     }
+
     set span (n) {
       span = n;
       initAll();
     }
+
     get span () {
       return span;
     }
-    set nPoints (n) {
-      nPoints = n;
+
+    set nParticles (n) {
+      nParticles = n;
       initAll()
     }
-    get nPoints () {
-      return nPoints;
+
+    get nParticles () {
+      return nParticles;
     }
+
     set pathLength (n) {
       pathLength = n;
       initAll()
     }
+
     get pathLength () {
       return pathLength;
     }
+
+    set startHue (b) {
+      startHue = b;
+      initAll();
+    }
+
+    get startHue () {
+      return startHue;
+    }
+
+    set hueFactor (b) {
+      hueFactor = b;
+      initAll();
+    }
+
+    get hueFactor () {
+      return hueFactor;
+    }
+
     set showPath (b) {
       showPath = b;
       if (b) {
@@ -110,9 +141,11 @@ const sketch = ({ context }) => {
         }
       }
     }
+
     get showPath () {
       return showPath;
     }
+
     set showPoints (b) {
       showPoints = b;
       if (b) {
@@ -121,9 +154,11 @@ const sketch = ({ context }) => {
         scene.remove(pointsObj);
       }
     }
+
     get showPoints () {
       return showPoints;
     }
+
     resetField () {
       initAll();
     }
@@ -131,11 +166,11 @@ const sketch = ({ context }) => {
 
   function initAll () {
     // clear scene
-    while(scene.children.length > 0){
+    while (scene.children.length > 0) {
       scene.remove(scene.children[0]);
     }
     initPaths();
-    initPoints();
+    initParticles();
   }
 
   function updateField () {
@@ -148,7 +183,7 @@ const sketch = ({ context }) => {
         return v => new THREE.Vector3(${vx}, ${vy});
       `)();
     } catch (e) {
-      console.info('Failed to update field: ', e);
+      console.info('Failed to update field: ', e.message);
     }
   }
 
@@ -157,29 +192,45 @@ const sketch = ({ context }) => {
   const c = new Controls();
   gui.add(c, 'vx');
   gui.add(c, 'vy');
-  gui.add(c, 'nPoints');
+  gui.add(c, 'nParticles');
   gui.add(c, 'span');
   gui.add(c, 'pathLength');
   gui.add(c, 'showPath');
   gui.add(c, 'showPoints');
+  gui.add(c, 'startHue');
+  gui.add(c, 'hueFactor');
   gui.add(c, 'resetField');
 
   function initPaths () {
     pathsObj = [];
     pathGeometries = [];
-    const diff = span / Math.sqrt(nPoints);
+    const diff = span / Math.sqrt(nParticles);
     const start = -span / 2, end = span / 2;
     for (let y = start; y < end; y += diff) {
       for (let x = start; x < end; x += diff) {
         // setup path geometry
         const pathGeometry = new THREE.BufferGeometry();
-        const pathArray = new Float32Array(pathLength * 2);
-        for (let i = 0; i < pathArray.length; i += 2) {
-          pathArray[i] = x;
-          pathArray[i + 1] = y;
+        const path = new Float32Array(pathLength * 2);
+        for (let i = 0; i < path.length; i += 2) {
+          path[i] = x;
+          path[i + 1] = y;
         }
-        pathGeometry.setAttribute('position', new THREE.BufferAttribute(pathArray, 2));
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, });
+        // generate random colors for line within hue interval
+        const colors = new Uint8Array(pathLength * 3);
+        const hue = Math.random() * hueFactor + startHue;
+        for (let i = 0; i < colors.length; i += 3) {
+          const luminosity = Math.round(50 * (1 / ((i / path.length) + 1)));
+          const color = toByteRGB(new THREE.Color(`hsl(${hue}, 100%, ${luminosity}%)`));
+          colors[i] = color.r;
+          colors[i + 1] = color.g;
+          colors[i + 2] = color.b;
+        }
+        pathGeometry.setAttribute('position', new THREE.BufferAttribute(path, 2));
+        pathGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: 0xffffff,
+          vertexColors: THREE.VertexColors
+        });
         const line = new THREE.Line(pathGeometry, lineMaterial);
         pathsObj.push(line);
         pathGeometries.push(pathGeometry);
@@ -188,10 +239,10 @@ const sketch = ({ context }) => {
     }
   }
 
-  function initPoints () {
-    const diff = span / Math.sqrt(nPoints);
+  function initParticles () {
+    const diff = span / Math.sqrt(nParticles);
     const start = -span / 2, end = span / 2;
-    const pointArray = new Float32Array(nPoints * 2);
+    const pointArray = new Float32Array(nParticles * 2);
     let index = 0;
     for (let y = start; y < end; y += diff) {
       for (let x = start; x < end; x += diff) {
