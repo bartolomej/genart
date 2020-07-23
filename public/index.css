@@ -74,6 +74,7 @@ body {
     height: 350px;
     transition: 0.2s all ease-in;
     margin: 50px 10px;
+    filter: brightness(1.3);
 }
 
 #container .art-link:hover, .art-link:active {

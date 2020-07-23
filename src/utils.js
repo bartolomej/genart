@@ -6,6 +6,14 @@ function toByteRGB (color) {
   };
 }
 
+const shortenedFunctionStrings = `
+  const cos = Math.cos;
+  const sin = Math.sin;
+  const pow = Math.pow;
+  const sqrt = Math.sqrt;
+`;
+
 module.exports = {
-  toByteRGB
+  toByteRGB,
+  shortenedFunctionStrings
 }

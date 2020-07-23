@@ -7,7 +7,7 @@ require("three/examples/js/controls/OrbitControls");
 require("three/examples/js/controls/FlyControls");
 
 const canvasSketch = require("canvas-sketch");
-const { toByteRGB } = require("../utils");
+const { toByteRGB, shortenedFunctionStrings } = require("../utils");
 
 const settings = {
   // Make the loop animated
@@ -252,10 +252,7 @@ const sketch = ({ context }) => {
   function updateField () {
     try {
       field = new Function(`
-        const cos = Math.cos;
-        const sin = Math.sin;
-        const pow = Math.pow;
-        const sqrt = Math.sqrt;
+        ${shortenedFunctionStrings}
         return v => new THREE.Vector3(${vx}, ${vy}, ${vz});
       `)();
     } catch (e) {
