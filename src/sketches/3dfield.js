@@ -1,6 +1,7 @@
 // Ensure ThreeJS is in global scope for the 'examples/'
 global.THREE = require("three");
 const dat = require('dat.gui');
+const Modal = require('../modal');
 
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
@@ -224,6 +225,13 @@ const sketch = ({ context }) => {
           updateField();
           break;
         }
+        case '3': {
+          vx = 'sin(v.x * cos(v.z * sin(v.x)))';
+          vy = 'sin(v.y * sin(v.z * cos(v.z)))';
+          vz = 'sin(v.z * cos(v.y * sin(v.y)))';
+          updateField();
+          break;
+        }
         default: {
           vx = '0';
           vy = '0';
@@ -277,6 +285,16 @@ const sketch = ({ context }) => {
   gui.add(c, 'vz');
   gui.add(c, 'resetField');
   gui.add(c, 'examples', [null, '1', '2', '3']);
+
+  const modal = new Modal({
+    title: '3D Vector Field',
+    description: `
+        <p>This is a three dimensional <a href="https://en.wikipedia.org/wiki/Vector_field">vector field</a> implemented in WebGL with <a href="https://threejs.org/">Three.js</a>.</p>
+        <p>A 3D vector field is essentially a function that takes 3 numbers (3d vector) as input and returns 3 new numbers (3d vector) as output. These numbers then determine velocity of a particle at that point in 3D space.</p>
+        <p>You can experiments with the parameters and examples. Have fun :)</p>
+    `
+  });
+  modal.show();
 
   function initPaths () {
     pathsObj = [];
@@ -422,6 +440,7 @@ const sketch = ({ context }) => {
     unload () {
       controls.dispose();
       renderer.dispose();
+      modal.hide();
     }
   };
 };

@@ -2,6 +2,7 @@
 global.THREE = require("three");
 const dat = require('dat.gui');
 const Audio = require('../audio');
+const Modal = require('../modal');
 
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
@@ -45,7 +46,7 @@ const sketch = async ({ context }) => {
 
   // Setup a camera
   const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 2500);
-  camera.position.set(0, 0, 250);
+  camera.position.set(0, 0, 450);
   camera.lookAt(new THREE.Vector3());
 
   // Setup camera controller
@@ -76,6 +77,21 @@ const sketch = async ({ context }) => {
         pos[j + 2] = step * frequencyArray[i] / 4;
       }
     }
+  }
+
+  function initCircle (r, y = 0) {
+    const pathArray = new Float32Array((pathLength + 1) * 3);
+    let dAngle = (Math.PI * 2) / pathLength, i = 0;
+    for (let angle = 0; angle <= Math.PI * 2; angle += dAngle) {
+      pathArray[i] = Math.cos(angle) * r;
+      pathArray[i + 1] = Math.sin(angle) * r;
+      pathArray[i + 2] = y;
+      i += 3;
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(pathArray, 3));
+    const material = new THREE.LineBasicMaterial({ color: new THREE.Color(`hsl(${(r * hueF) + hueStart}, 100%, 50%)`) });
+    return new THREE.Line(geometry, material);
   }
 
   initScene();
@@ -135,31 +151,44 @@ const sketch = async ({ context }) => {
       return nCircles;
     }
 
+    set noiseF (n) {
+      noiseF = n;
+    }
+
+    get noiseF () {
+      return noiseF;
+    }
+
+    set noiseStepF (n) {
+      noiseStepF = n;
+    }
+
+    get noiseStepF () {
+      return noiseStepF;
+    }
+
   }
 
   const gui = new dat.GUI();
   const c = new Controls();
-  gui.add(c, 'pathLength', 3, 200, 1);
+  gui.add(c, 'pathLength', 3, 500, 1);
   gui.add(c, 'hueStart', 0, 360);
   gui.add(c, 'hueF', 0, 5);
   gui.add(c, 'startRadius', 1, 100);
   gui.add(c, 'radiusStep', 0, 5);
   gui.add(c, 'nCircles', 10, 200);
+  gui.add(c, 'noiseF', 0, 0.5);
+  gui.add(c, 'noiseStepF', 0, 20);
 
-  function initCircle (r, y = 0) {
-    const pathArray = new Float32Array((pathLength + 1) * 3);
-    let dAngle = (Math.PI * 2) / pathLength, i = 0;
-    for (let angle = 0; angle <= Math.PI * 2; angle += dAngle) {
-      pathArray[i] = Math.cos(angle) * r;
-      pathArray[i + 1] = Math.sin(angle) * r;
-      pathArray[i + 2] = y;
-      i += 3;
-    }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(pathArray, 3));
-    const material = new THREE.LineBasicMaterial({ color: new THREE.Color(`hsl(${(r + hueStart) * hueF}, 100%, 50%)`) });
-    return new THREE.Line(geometry, material);
-  }
+  const modal = new Modal({
+    title: 'Circular Sound',
+    description: `
+    <p>Hi! This is an interactive sound visualization, so you will need to enable microphone usage.</p>
+    <p>On the top right corner there is a small window with a bunch of different sliders. Don't worry if you don't understand what they do exactly.</p>
+    <p>You can also rotate and control distance with your mouse or fingers if on mobile.</p>
+    <p>You can freely play with them, your wont break anything :). <b>Enjoy!</b></p>`
+  });
+  modal.show();
 
   // draw each frame
   return {
@@ -180,6 +209,7 @@ const sketch = async ({ context }) => {
     unload () {
       controls.dispose();
       renderer.dispose();
+      modal.hide();
     }
   };
 };

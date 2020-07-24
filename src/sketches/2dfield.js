@@ -1,6 +1,7 @@
 // Ensure ThreeJS is in global scope for the 'examples/'
 global.THREE = require("three");
 const dat = require('dat.gui');
+const Modal = require('../modal');
 
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
@@ -228,6 +229,16 @@ const sketch = ({ context }) => {
   gui.add(c, 'resetField');
   gui.add(c, 'example', [null, '1', '2']);
 
+  const modal = new Modal({
+    title: '2D Vector Field',
+    description: `
+        <p>This is a two dimensional <a href="https://en.wikipedia.org/wiki/Vector_field">vector field</a> implemented in WebGL with <a href="https://threejs.org/">Three.js</a>.</p>
+        <p>A 2D vector field is essentially a function that takes 2 numbers (2d vector) as input and returns 2 new numbers (2d vector) as output. These numbers then determine velocity of a particle at that point in 2D space.</p>
+        <p>You can experiments with the parameters and examples. Have fun :)</p>
+    `
+  });
+  modal.show();
+
   function initPaths () {
     pathsObj = [];
     pathGeometries = [];
@@ -333,12 +344,12 @@ const sketch = ({ context }) => {
     unload () {
       controls.dispose();
       renderer.dispose();
+      modal.hide();
     },
     // Update & render your scene here
     render ({ time }) {
       updatePath();
       updatePoints();
-
       controls.update();
       renderer.render(scene, camera);
     }
