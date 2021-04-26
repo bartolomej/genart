@@ -6,9 +6,11 @@ const Modal = require('../modal');
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
 require("three/examples/js/controls/FlyControls");
+require("three/examples/js/exporters/STLExporter");
+require("three/examples/js/exporters/OBJExporter");
 
 const canvasSketch = require("canvas-sketch");
-const { toByteRGB, shortenedFunctionStrings } = require("../utils");
+const { toByteRGB, saveFile, shortenedFunctionStrings } = require("../utils");
 
 const settings = {
   // Make the loop animated
@@ -208,6 +210,21 @@ const sketch = ({ context }) => {
       initAll();
     }
 
+    exportToTsl() {
+      const exporter = new THREE.STLExporter();
+      const str = exporter.parse( scene );
+      const blob = new Blob( [str], { type : 'text/plain' } );
+      saveFile(blob, `3dfield_${Date.now()}.stl`)
+    }
+
+    exportToObj() {
+      const exporter = new THREE.OBJExporter();
+      const str = exporter.parse( scene );
+      const blob = new Blob( [str], { type : 'text/plain' } );
+      saveFile(blob, `3dfield_${Date.now()}.obj`)
+    }
+
+
     set examples (s) {
       example = s;
       switch (s) {
@@ -284,6 +301,8 @@ const sketch = ({ context }) => {
   gui.add(c, 'vy');
   gui.add(c, 'vz');
   gui.add(c, 'resetField');
+  gui.add(c, 'exportToTsl');
+  gui.add(c, 'exportToObj');
   gui.add(c, 'examples', [null, '1', '2', '3']);
 
   const modal = new Modal({

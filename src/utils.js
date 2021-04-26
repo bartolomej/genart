@@ -6,6 +6,15 @@ function toByteRGB (color) {
   };
 }
 
+function saveFile(blob, filename) {
+  const link = document.createElement('a');
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.href = URL.createObjectURL(blob);
+  link.download = filename || `${Date.now()}.txt`;
+  link.click();
+}
+
 const shortenedFunctionStrings = `
   const cos = Math.cos;
   const sin = Math.sin;
@@ -15,5 +24,6 @@ const shortenedFunctionStrings = `
 
 module.exports = {
   toByteRGB,
+  saveFile,
   shortenedFunctionStrings
 }
