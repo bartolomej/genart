@@ -20,6 +20,7 @@
   "dependencies": {
     "canvas-sketch": "0.7.3",
     "canvas-sketch-util": "1.10.0",
+    "chroma-js": "^2.4.2",
     "dat.gui": "0.7.7",
     "three": "0.117.1"
   }
