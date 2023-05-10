@@ -2,7 +2,7 @@ const canvasSketch = require('canvas-sketch');
 const { Vector, Matrix } = require('../math');
 const chroma = require('chroma-js')
 
-const size = 2000;
+const size = 4000;
 
 const settings = {
   duration: 3,
@@ -17,7 +17,7 @@ const sketch = async ({ width: w, height: h, context }) => {
   const res = { xMin: -w / 2, xMax: w / 2, yMin: -h / 2, yMax: h / 2 };
 
   const nVectors = 10;
-  const nParticles = 1000;
+  const nParticles = 2000;
   const maxPathLength = 100;
   const pathWidth = 8;
   const integrationStep = 0.05;
@@ -29,7 +29,7 @@ const sketch = async ({ width: w, height: h, context }) => {
   const m = new Matrix([spanX / w, 0], [0, spanY / h]);
   // velocity gradient vector function
   const velocity = position => new Vector(
-      Math.sin(position.abs()+Math.cos(position.x)),
+      Math.sin(position.abs() + position.abs()),
       Math.cos(position.abs()+(Math.sin(position.x)+Math.cos(position.x)))
   ).scalarI(integrationStep);
 
