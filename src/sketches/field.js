@@ -1,9 +1,12 @@
 const canvasSketch = require('canvas-sketch');
 const { Vector, Matrix } = require('../math');
+const chroma = require('chroma-js')
+
+const size = 2000;
 
 const settings = {
   duration: 3,
-  dimensions: [2000, 2000],
+  dimensions: [size, size],
   scaleToView: true,
   playbackRate: 'throttle',
   animate: true,
@@ -16,17 +19,18 @@ const sketch = async ({ width: w, height: h, context }) => {
   const nVectors = 10;
   const nParticles = 1000;
   const maxPathLength = 100;
-  const pathWidth = 5;
-  const integrationStep = 0.01;
-  const spanX = 1;
-  const spanY = 1;
+  const pathWidth = 8;
+  const integrationStep = 0.05;
+  const span = 20;
+  const spanX = span;
+  const spanY = span;
 
   // transformation matrix
   const m = new Matrix([spanX / w, 0], [0, spanY / h]);
   // velocity gradient vector function
-  const velocity = p => new Vector(
-    -Math.pow(p.y, 2),
-    Math.pow(p.x, 3) + Math.pow(p.y, 2)
+  const velocity = position => new Vector(
+      Math.sin(position.abs()+Math.cos(position.x)),
+      Math.cos(position.abs()+(Math.sin(position.x)+Math.cos(position.x)))
   ).scalarI(integrationStep);
 
   // calculate n of vectors for each dimension
@@ -44,7 +48,7 @@ const sketch = async ({ width: w, height: h, context }) => {
       particles.push({
         path: [],
         v: m.transformI(new Vector(x, y)),
-        c: `hsla(${Math.random() * 100 + 150}, 100%, 50%, 1)`
+        color: ({progressTowardsPathEnd}) => chroma(`#C68FFF`).alpha(progressTowardsPathEnd)
       });
     }
   }
@@ -68,7 +72,7 @@ const sketch = async ({ width: w, height: h, context }) => {
 
   function drawParticles (ctx) {
     for (let i = 0; i < particles.length; i++) {
-      let { path, v, c } = particles[i];
+      let { path, v, color } = particles[i];
 
       path.push(v.clone());
 
@@ -83,8 +87,9 @@ const sketch = async ({ width: w, height: h, context }) => {
         ctx.beginPath();
         ctx.moveTo(v0.x, v0.y);
         ctx.lineTo(v1.x, v1.y);
-        ctx.lineWidth = Math.round(pathWidth * (i / path.length)) + 1;
-        ctx.strokeStyle = c;
+        const progressTowardsPathEnd = i / path.length;
+        ctx.lineWidth = Math.round(pathWidth * progressTowardsPathEnd) + 1;
+        ctx.strokeStyle = color({ progressTowardsPathEnd });
         ctx.stroke();
       }
     }
