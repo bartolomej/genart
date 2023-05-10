@@ -4,11 +4,11 @@ These experiments utilize a helpful library called [canvas-sketch](https://githu
 
 ```bash
 # Start a new sketch from the Three.js template
-canvas-sketch --new --template=three
+npx canvas-sketch-cli --new --template=three
 
 # Run existing sketch
-canvas-sketch sketch.js --open --hot
+npx canvas-sketch-cli sketch.js --open --hot
 
 # Build a sketch
-canvas-sketch src/sketches/sketch.js --dir public/sketches --build --source-map=false --html=public/sketch.html
+npx canvas-sketch-cli src/sketches/<sketch-name>.js --dir public/sketches --build --source-map=false
 ```
