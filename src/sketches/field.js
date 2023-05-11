@@ -16,40 +16,57 @@ const settings = {
 const sketch = async ({ width: w, height: h, context }) => {
   const res = { xMin: -w / 2, xMax: w / 2, yMin: -h / 2, yMax: h / 2 };
 
-  const nVectors = 10;
-  const nParticles = 2000;
+  const totalVectors = 0;
+  const totalParticles = 5000;
   const maxPathLength = 100;
-  const pathWidth = 8;
+  const widthFactor = 30;
   const integrationStep = 0.05;
-  const span = 20;
+  const span = 15;
   const spanX = span;
   const spanY = span;
 
   // transformation matrix
   const m = new Matrix([spanX / w, 0], [0, spanY / h]);
   // velocity gradient vector function
-  const velocity = position => new Vector(
-      Math.sin(position.abs() + position.abs()),
-      Math.cos(position.abs()+(Math.sin(position.x)+Math.cos(position.x)))
+  const velocity = v => new Vector(
+      Math.sin(v.y * Math.sin(v.x * Math.sin(v.y))),
+      Math.sin(v.x * Math.sin(v.y * Math.sin(v.x)))
   ).scalarI(integrationStep);
 
   // calculate n of vectors for each dimension
-  let vSrt = Math.sqrt(nVectors);
+  let vSrt = Math.sqrt(totalVectors);
   let vdx = w / vSrt, vdy = h / vSrt;
 
   // calculate n of particles for each dimension
-  let dSrt = Math.sqrt(nParticles);
+  let dSrt = Math.sqrt(totalParticles);
   let pdx = w / dSrt, pdy = h / dSrt;
+
+  const colorPallet = [
+    '#FFCBF2',
+    '#F3C4FB',
+    '#ECBCFD',
+    '#E5B3FE',
+    '#E2AFFF',
+    '#DEAAFF',
+    '#D8BBFF',
+    '#D0D1FF',
+    '#C8E7FF',
+  ];
+
+  const colorInterpolator = chroma.bezier(colorPallet);
 
   // generate initial particles
   let particles = [];
+  let particleIndex = 0;
   for (let y = res.yMin; y < res.yMax; y += pdy) {
     for (let x = res.xMin; x < res.xMax; x += pdx) {
+      const baseColor = colorInterpolator(Math.random());
       particles.push({
         path: [],
         v: m.transformI(new Vector(x, y)),
-        color: ({progressTowardsPathEnd}) => chroma(`#C68FFF`).alpha(progressTowardsPathEnd)
+        color: ({progressTowardsPathEnd}) => chroma(baseColor).alpha(progressTowardsPathEnd)
       });
+      particleIndex++;
     }
   }
 
@@ -62,10 +79,10 @@ const sketch = async ({ width: w, height: h, context }) => {
     ctx.fillStyle = 'black';
     ctx.fillRect(-width, -height, width * 2, height * 2);
 
-    if (nVectors > 0) {
+    if (totalVectors > 0) {
       drawVectors(ctx);
     }
-    if (nParticles > 0) {
+    if (totalParticles > 0) {
       drawParticles(ctx);
     }
   };
@@ -77,6 +94,8 @@ const sketch = async ({ width: w, height: h, context }) => {
       path.push(v.clone());
 
       v.addM(velocity(v));
+      const progressFromCenter = 1- (v.abs() / span);
+      const width = progressFromCenter * widthFactor;
       if (path.length >= maxPathLength) {
         path.splice(0, 1);
       }
@@ -88,7 +107,7 @@ const sketch = async ({ width: w, height: h, context }) => {
         ctx.moveTo(v0.x, v0.y);
         ctx.lineTo(v1.x, v1.y);
         const progressTowardsPathEnd = i / path.length;
-        ctx.lineWidth = Math.round(pathWidth * progressTowardsPathEnd) + 1;
+        ctx.lineWidth = Math.round(width * progressTowardsPathEnd) + 1;
         ctx.strokeStyle = color({ progressTowardsPathEnd });
         ctx.stroke();
       }
